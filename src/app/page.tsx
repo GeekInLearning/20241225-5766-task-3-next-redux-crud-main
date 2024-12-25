@@ -1,7 +1,13 @@
 // src/app/posts/page.tsx
 "use client";
 import { useSelector, useDispatch } from "react-redux";
-import { addPost, deletePost, updatePost, selectPostById } from "@/redux/slices/postSlice";
+import {
+  addPost,
+  deletePost,
+  updatePost,
+  selectPostById,
+  IPostStateSlice,
+} from "@/redux/slices/postSlice";
 import styles from "./page.module.css";
 import { useState } from "react";
 
@@ -14,7 +20,9 @@ export default function Posts() {
   const [editDescription, setEditDescription] = useState("");
   const [selectedPost, setSelectedPost] = useState<any>(null);
 
-  const posts = useSelector((state: any) => state.posts);
+  const posts = useSelector(
+    (state: { posts: IPostStateSlice[] }) => state.posts
+  );
   const dispatch = useDispatch();
 
   const handleAddPost = (e: any) => {
@@ -48,9 +56,10 @@ export default function Posts() {
   const handleUpdatePost = (e: any) => {
     e.preventDefault();
 
+    if (!editPostId) return;
     if (!editTitle && !editDescription) return;
 
-    const updatedPost = {
+    const updatedPost: IPostStateSlice = {
       id: editPostId,
       title: editTitle,
       description: editDescription,
@@ -71,15 +80,22 @@ export default function Posts() {
 
   return (
     <div className={styles.card}>
-      <form className={styles.form} onSubmit={editMode ? handleUpdatePost : handleAddPost}>
-        <p className={styles.formTitle}>{editMode ? "Edit Post" : "Add New Post"}</p>
+      <form
+        className={styles.form}
+        onSubmit={editMode ? handleUpdatePost : handleAddPost}
+      >
+        <p className={styles.formTitle}>
+          {editMode ? "Edit Post" : "Add New Post"}
+        </p>
         <div className={styles.inputContainer}>
           <input
             type="text"
             className={styles.input}
             placeholder="Title"
             value={editMode ? editTitle : title}
-            onChange={(e) => (editMode ? setEditTitle(e.target.value) : setTitle(e.target.value))}
+            onChange={(e) =>
+              editMode ? setEditTitle(e.target.value) : setTitle(e.target.value)
+            }
           />
         </div>
         <div className={styles.inputContainer}>
@@ -87,7 +103,11 @@ export default function Posts() {
             placeholder="Description"
             value={editMode ? editDescription : description}
             className={styles.input}
-            onChange={(e) => (editMode ? setEditDescription(e.target.value) : setDescription(e.target.value))}
+            onChange={(e) =>
+              editMode
+                ? setEditDescription(e.target.value)
+                : setDescription(e.target.value)
+            }
           ></textarea>
         </div>
         <button className={styles.submit} type="submit">
@@ -97,9 +117,15 @@ export default function Posts() {
       <h1 className={styles.heading}>Posts</h1>
       {selectedPost && (
         <div className={styles.selectedPost}>
-          <h1><strong>Post Details</strong></h1>
-          <p><strong>Title:</strong> {selectedPost.title}</p>
-          <p><strong>Description:</strong> {selectedPost.description}</p>
+          <h1>
+            <strong>Post Details</strong>
+          </h1>
+          <p>
+            <strong>Title:</strong> {selectedPost.title}
+          </p>
+          <p>
+            <strong>Description:</strong> {selectedPost.description}
+          </p>
         </div>
       )}
       {posts ? (
